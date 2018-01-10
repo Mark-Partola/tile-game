@@ -1,3 +1,5 @@
+import loop from './loop.js';
+
 const WIDTH = 1024;
 const HEIGHT = 724;
 
@@ -86,30 +88,92 @@ function init([sprite, level]) {
     spriteMap.set(0, ground);
     spriteMap.set(1, grass);
 
-    let x = 0;
-    loop(() => {
-        ctx.resetTransform();
-        ctx.clearRect(x, 0, WIDTH - x, HEIGHT);
-        ctx.translate(x -= 2, 0);
+    class MouseController {
 
-        level.forEach((row, rowIdx) => row.forEach((cell, cellIdx) => {
-            const tile = spriteMap.get(cell);
+        constructor() {
+            this.isMouseDown = false;
+            this.mousemove = null;
+
+            document.addEventListener('mousedown', (e) => this.isMouseDown = true);
+            document.addEventListener('mouseup', (e) => this.isMouseDown = false);
+            document.addEventListener('mousemove', (e) => this.mousemove = e);
+        }
+        
+        getIsMouseDown() {
+            return this.isMouseDown;
+        }
     
-            tile.position = {
-                x: cellIdx * TILE_SIZE,
-                y: rowIdx * TILE_SIZE
+        getPosition() {
+            const box = ctx.canvas.getBoundingClientRect();
+            return {
+                x: this.mousemove.pageX - box.left,
+                y: this.mousemove.pageY - box.top
             };
-    
-            tile.render(ctx);
-        }));
-    });
-}
-
-function loop(fn) {
-    function run() {
-        fn();
-        requestAnimationFrame(run);
+        }
     }
 
-    requestAnimationFrame(run);
+    const mouseController = new MouseController();
+
+    let offset = {
+        x: 0,
+        y: 0
+    };
+
+    let isPrevMouseDown = false;
+    let prevPosition;
+
+    const game = {
+
+        update() {
+            const isMouseDown = mouseController.getIsMouseDown();
+
+            if (isMouseDown) {
+                const position = mouseController.getPosition();
+
+                console.log(prevPosition, position);
+                if (isPrevMouseDown) {
+                    offset = {
+                        x: (position.x - offset.x) + prevPosition.x,
+                        y: (position.y - offset.y) + prevPosition.y
+                    };
+                }
+
+                isPrevMouseDown = true;
+                prevPosition = offset;
+            } else {
+                isPrevMouseDown = false;
+            }
+        },
+
+        render(ctx) {
+            ctx.resetTransform();
+            ctx.clearRect(
+                0,
+                0,
+                WIDTH,
+                HEIGHT
+            );
+            ctx.translate(offset.x, offset.y);
+    
+            level.forEach((row, rowIdx) => row.forEach((cell, cellIdx) => {
+                const tile = spriteMap.get(cell);
+    
+                tile.position = {
+                    x: cellIdx * TILE_SIZE,
+                    y: rowIdx * TILE_SIZE
+                };
+        
+                tile.render(ctx);
+            }));
+        },
+
+        run() {
+            loop(() => {
+                this.update();
+                this.render(ctx);
+            });
+        }
+    };
+
+    game.run();
 }
