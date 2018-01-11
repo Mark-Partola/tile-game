@@ -84,9 +84,18 @@ function init([sprite, level]) {
         }
     });
 
+    const water = new Sprite({
+        resource: sprite,
+        crop: {
+            x: TILE_SIZE * 28,
+            y: TILE_SIZE * 4
+        }
+    });
+
     const spriteMap = new Map();
     spriteMap.set(0, ground);
     spriteMap.set(1, grass);
+    spriteMap.set(2, water);
 
     class MouseController {
 
@@ -114,15 +123,14 @@ function init([sprite, level]) {
 
     const mouseController = new MouseController();
 
-    let offset = {
-        x: 0,
-        y: 0
-    };
-
-    let isPrevMouseDown = false;
-    let prevPosition;
-
     const game = {
+
+        offset: {
+            x: 0,
+            y: 0
+        },
+
+        prevPosition: null,
 
         update() {
             const isMouseDown = mouseController.getIsMouseDown();
@@ -130,18 +138,16 @@ function init([sprite, level]) {
             if (isMouseDown) {
                 const position = mouseController.getPosition();
 
-                console.log(prevPosition, position);
-                if (isPrevMouseDown) {
-                    offset = {
-                        x: (position.x - offset.x) + prevPosition.x,
-                        y: (position.y - offset.y) + prevPosition.y
+                if (this.prevPosition) {
+                    this.offset = {
+                        x: this.offset.x + (position.x - this.prevPosition.x),
+                        y: this.offset.y + (position.y - this.prevPosition.y)
                     };
                 }
 
-                isPrevMouseDown = true;
-                prevPosition = offset;
+                this.prevPosition = position;
             } else {
-                isPrevMouseDown = false;
+                this.prevPosition = null;
             }
         },
 
@@ -153,7 +159,7 @@ function init([sprite, level]) {
                 WIDTH,
                 HEIGHT
             );
-            ctx.translate(offset.x, offset.y);
+            ctx.translate(this.offset.x, this.offset.y);
     
             level.forEach((row, rowIdx) => row.forEach((cell, cellIdx) => {
                 const tile = spriteMap.get(cell);
