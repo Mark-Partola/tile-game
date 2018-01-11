@@ -62,12 +62,13 @@ class Sprite {
 
 Promise.all([
     loadResource('assets/images/sprite.png'),
-    loadResource('assets/levels/1.json')
+    loadResource('assets/levels/1.json'),
+    loadResource('assets/images/characters.png')
 ])
     .then(init)
     .catch((e) => console.log('Error ocurred!', e));
 
-function init([sprite, level]) {
+function init([sprite, level, characters]) {
     const ground = new Sprite({
         resource: sprite,
         crop: {
@@ -97,6 +98,14 @@ function init([sprite, level]) {
         crop: {
             x: TILE_SIZE * 14,
             y: TILE_SIZE * 13
+        }
+    });
+
+    const character = new Sprite({
+        resource: characters,
+        crop: {
+            x: 0,
+            y: TILE_SIZE * 7
         }
     });
 
@@ -130,7 +139,29 @@ function init([sprite, level]) {
         }
     }
 
+    const KeyboardKeys = {
+        W: 87,
+        A: 31,
+        S: 33,
+        D: 30
+    };
+
+    class KeyboardController {
+
+        constructor() {
+            this.activeKey = null;
+
+            document.addEventListener('keydown', (e) => this.activeKey = e);
+            document.addEventListener('keyup', (e) => this.activeKey = null);
+        }
+
+        isPressedKey(key) {
+            return (this.activeKey && this.activeKey.keyCode === key) || false;
+        }
+    }
+
     const mouseController = new MouseController();
+    const keyboardController = new KeyboardController();
 
     const game = {
 
@@ -187,6 +218,11 @@ function init([sprite, level]) {
             level.forEach((row, rowIdx) => row.forEach((cell, cellIdx) =>
                 renderTile(cell, {x: cellIdx, y: rowIdx})
             ));
+
+            const isGoUp = keyboardController.isPressedKey(KeyboardKeys.W);
+        
+            character.position = {x: TILE_SIZE * 5, y: TILE_SIZE * 5 + (isGoUp ? -5 : 0)};
+            character.render(ctx);
         },
 
         run() {
