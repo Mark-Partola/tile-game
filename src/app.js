@@ -91,11 +91,20 @@ function init([sprite, level]) {
             y: TILE_SIZE * 4
         }
     });
+ 
+    const tree = new Sprite({
+        resource: sprite,
+        crop: {
+            x: TILE_SIZE * 14,
+            y: TILE_SIZE * 13
+        }
+    });
 
     const spriteMap = new Map();
     spriteMap.set(0, ground);
     spriteMap.set(1, grass);
     spriteMap.set(2, water);
+    spriteMap.set(3, tree);
 
     class MouseController {
 
@@ -160,17 +169,24 @@ function init([sprite, level]) {
                 HEIGHT
             );
             ctx.translate(this.offset.x, this.offset.y);
+
+            function renderTile(cell, pos) {
+                if (Array.isArray(cell)) {
+                    cell.forEach(tile => renderTile(tile, pos));
+                } else {
+                    const tile = spriteMap.get(cell);
+                    tile.position = {
+                        x: pos.x * TILE_SIZE,
+                        y: pos.y * TILE_SIZE
+                    };
+            
+                    tile.render(ctx);
+                }
+            }
     
-            level.forEach((row, rowIdx) => row.forEach((cell, cellIdx) => {
-                const tile = spriteMap.get(cell);
-    
-                tile.position = {
-                    x: cellIdx * TILE_SIZE,
-                    y: rowIdx * TILE_SIZE
-                };
-        
-                tile.render(ctx);
-            }));
+            level.forEach((row, rowIdx) => row.forEach((cell, cellIdx) =>
+                renderTile(cell, {x: cellIdx, y: rowIdx})
+            ));
         },
 
         run() {
