@@ -1,119 +1,30 @@
-import loop from './loop.js';
-
-const WIDTH = 1024;
-const HEIGHT = 724;
+import config from './config.js';
+import loop from './system/loop.js';
+import loadResource from './system/load-resource.js';
+import spritesLoader from './sprites/index.js';
 
 const canvas = document.createElement('canvas');
-canvas.width = WIDTH;
-canvas.height = HEIGHT;
+canvas.width = config.APP_WIDTH;
+canvas.height = config.APP_HEIGHT;
 canvas.classList.add('game');
 
 document.body.appendChild(canvas);
 
 const ctx = canvas.getContext('2d');
 
-function loadResource (path) {
-    const type = path.split('.').pop();
-    
-    if (type === 'json') {
-        return fetch(path).then(response => response.json());
-    }
-
-    return new Promise((resolve, reject) => {
-        const sprite = new Image();
-        sprite.onload = () => resolve(sprite);
-        sprite.onerror = reject;
-        sprite.src = `../${path}`;
-    });
-}
-
-const TILE_SIZE = 32;
-
-class Sprite {
-
-    constructor({
-        resource,
-        dimensions = {
-            width: TILE_SIZE,
-            heigth: TILE_SIZE
-        },
-        crop = {
-            x: 0,
-            y: 0
-        },
-        position
-    }) {
-        this.resource = resource; 
-        this.dimensions = dimensions;
-        this.crop = crop;
-        this.position = position;
-    }
-
-    render(ctx) {
-        ctx.drawImage(
-            this.resource,
-            this.crop.x, this.crop.y,
-            this.dimensions.width, this.dimensions.heigth,
-            this.position.x, this.position.y,
-            this.dimensions.width, this.dimensions.heigth
-        );
-    } 
-}
-
 Promise.all([
-    loadResource('assets/images/sprite.png'),
-    loadResource('assets/levels/1.json'),
-    loadResource('assets/images/characters.png')
+    spritesLoader.init(),
+    loadResource('assets/levels/1.json')
 ])
     .then(init)
     .catch((e) => console.log('Error ocurred!', e));
 
-function init([sprite, level, characters]) {
-    const ground = new Sprite({
-        resource: sprite,
-        crop: {
-            x: TILE_SIZE * 41,
-            y: TILE_SIZE * 2
-        }
-    });
-
-    const grass = new Sprite({
-        resource: sprite,
-        crop: {
-            x: TILE_SIZE * 29,
-            y: TILE_SIZE * 8
-        }
-    });
-
-    const water = new Sprite({
-        resource: sprite,
-        crop: {
-            x: TILE_SIZE * 28,
-            y: TILE_SIZE * 4
-        }
-    });
- 
-    const tree = new Sprite({
-        resource: sprite,
-        crop: {
-            x: TILE_SIZE * 14,
-            y: TILE_SIZE * 13
-        }
-    });
-
-    const character = new Sprite({
-        resource: characters,
-        crop: {
-            x: 0,
-            y: TILE_SIZE * 7
-        }
-    });
-
+function init([sprites, level]) {
     const spriteMap = new Map();
-    spriteMap.set(0, ground);
-    spriteMap.set(1, grass);
-    spriteMap.set(2, water);
-    spriteMap.set(3, tree);
+    spriteMap.set(0, sprites.ground);
+    spriteMap.set(1, sprites.grass);
+    spriteMap.set(2, sprites.water);
+    spriteMap.set(3, sprites.tree);
 
     class MouseController {
 
@@ -196,8 +107,8 @@ function init([sprite, level, characters]) {
             ctx.clearRect(
                 0,
                 0,
-                WIDTH,
-                HEIGHT
+                config.APP_WIDTH,
+                config.APP_HEIGHT
             );
             ctx.translate(this.offset.x, this.offset.y);
 
@@ -207,8 +118,8 @@ function init([sprite, level, characters]) {
                 } else {
                     const tile = spriteMap.get(cell);
                     tile.position = {
-                        x: pos.x * TILE_SIZE,
-                        y: pos.y * TILE_SIZE
+                        x: pos.x * config.TILE_SIZE,
+                        y: pos.y * config.TILE_SIZE
                     };
             
                     tile.render(ctx);
@@ -221,8 +132,11 @@ function init([sprite, level, characters]) {
 
             const isGoUp = keyboardController.isPressedKey(KeyboardKeys.W);
         
-            character.position = {x: TILE_SIZE * 5, y: TILE_SIZE * 5 + (isGoUp ? -5 : 0)};
-            character.render(ctx);
+            sprites.character.position = {
+                x: config.TILE_SIZE * 5,
+                y: config.TILE_SIZE * 5 + (isGoUp ? -5 : 0)
+            };
+            sprites.character.render(ctx);
         },
 
         run() {
