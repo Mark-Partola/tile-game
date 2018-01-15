@@ -2,6 +2,7 @@ import config from './config.js';
 import loop from './system/loop.js';
 import loadResource from './system/load-resource.js';
 import MouseController from './system/mouse-controller.js';
+import Entity from './system/entity.js';
 import spritesLoader from './sprites/index.js';
 import Character from './character.js';
 
@@ -31,14 +32,20 @@ function init([sprites, level]) {
     const mouseController = new MouseController();
     const character = new Character(sprites.character);
 
-    const game = {
+    class Game extends Entity {
 
-        offset: {
-            x: 0,
-            y: 0
-        },
+        constructor() {
+            super();
+ 
+            this.offset = {
+                x: 0,
+                y: 0
+            };
 
-        prevPosition: null,
+            this.prevPosition = null;
+
+            this.components = [character];
+        }
 
         update() {
             const isMouseDown = mouseController.getIsMouseDown();
@@ -57,9 +64,7 @@ function init([sprites, level]) {
             } else {
                 this.prevPosition = null;
             }
-
-            character.update();
-        },
+        }
 
         render(ctx) {
             ctx.resetTransform();
@@ -88,17 +93,12 @@ function init([sprites, level]) {
             level.forEach((row, rowIdx) => row.forEach((cell, cellIdx) =>
                 renderTile(cell, {x: cellIdx, y: rowIdx})
             ));
-
-            character.render(ctx);
-        },
-
-        run() {
-            loop(() => {
-                this.update();
-                this.render(ctx);
-            });
         }
     };
 
-    game.run();
+    /**
+     * TODO: remove the Game class. Thing how to pass the ctx
+     */
+    const game = new Game();
+    loop(game.run.bind(game, ctx));
 }

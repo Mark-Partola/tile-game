@@ -1,11 +1,14 @@
 import config from './config.js';
 import KeyboardController, {KeyboardKeys} from './system/keyboard-controller.js';
+import Entity from './system/entity.js';
 
 const keyboardController = new KeyboardController();
 
-export default class Character {
+export default class Character extends Entity {
 
     constructor(sprite) {
+        super();
+
         this.sprite = sprite;
         this.position = {
             x: 10 * config.TILE_SIZE,
@@ -20,12 +23,13 @@ export default class Character {
         const isGoLeft = keyboardController.checkOneOfKeysPressed([KeyboardKeys.A, KeyboardKeys.LEFT]);
         const isGoRight = keyboardController.checkOneOfKeysPressed([KeyboardKeys.D, KeyboardKeys.RIGHT]);
 
+        /**
+         * TODO: fix accelerating on hypotenuse
+         */
         const offset = {
             x: isGoLeft ? -this.speed : (isGoRight ? this.speed : 0),
             y: isGoUp ? -this.speed : (isGoDown ? this.speed : 0)
         };
-
-        console.log(isGoUp, isGoRight);
 
         this.position = {
             x: this.position.x + offset.x,

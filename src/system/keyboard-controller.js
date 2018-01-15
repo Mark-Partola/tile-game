@@ -2,7 +2,11 @@ export const KeyboardKeys = {
     W: 87,
     A: 65,
     S: 83,
-    D: 68
+    D: 68,
+    UP: 38,
+    DOWN: 40,
+    RIGHT: 39,
+    LEFT: 37
 };
 
 export default class KeyboardController {
