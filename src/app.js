@@ -1,7 +1,9 @@
 import config from './config.js';
 import loop from './system/loop.js';
 import loadResource from './system/load-resource.js';
+import MouseController from './system/mouse-controller.js';
 import spritesLoader from './sprites/index.js';
+import Character from './character.js';
 
 const canvas = document.createElement('canvas');
 canvas.width = config.APP_WIDTH;
@@ -26,53 +28,8 @@ function init([sprites, level]) {
     spriteMap.set(2, sprites.water);
     spriteMap.set(3, sprites.tree);
 
-    class MouseController {
-
-        constructor() {
-            this.isMouseDown = false;
-            this.mousemove = null;
-
-            document.addEventListener('mousedown', (e) => this.isMouseDown = true);
-            document.addEventListener('mouseup', (e) => this.isMouseDown = false);
-            document.addEventListener('mousemove', (e) => this.mousemove = e);
-        }
-        
-        getIsMouseDown() {
-            return this.isMouseDown;
-        }
-    
-        getPosition() {
-            const box = ctx.canvas.getBoundingClientRect();
-            return {
-                x: this.mousemove.pageX - box.left,
-                y: this.mousemove.pageY - box.top
-            };
-        }
-    }
-
-    const KeyboardKeys = {
-        W: 87,
-        A: 31,
-        S: 33,
-        D: 30
-    };
-
-    class KeyboardController {
-
-        constructor() {
-            this.activeKey = null;
-
-            document.addEventListener('keydown', (e) => this.activeKey = e);
-            document.addEventListener('keyup', (e) => this.activeKey = null);
-        }
-
-        isPressedKey(key) {
-            return (this.activeKey && this.activeKey.keyCode === key) || false;
-        }
-    }
-
     const mouseController = new MouseController();
-    const keyboardController = new KeyboardController();
+    const character = new Character(sprites.character);
 
     const game = {
 
@@ -87,7 +44,7 @@ function init([sprites, level]) {
             const isMouseDown = mouseController.getIsMouseDown();
 
             if (isMouseDown) {
-                const position = mouseController.getPosition();
+                const position = mouseController.getPosition(ctx.canvas);
 
                 if (this.prevPosition) {
                     this.offset = {
@@ -100,6 +57,8 @@ function init([sprites, level]) {
             } else {
                 this.prevPosition = null;
             }
+
+            character.update();
         },
 
         render(ctx) {
@@ -130,13 +89,7 @@ function init([sprites, level]) {
                 renderTile(cell, {x: cellIdx, y: rowIdx})
             ));
 
-            const isGoUp = keyboardController.isPressedKey(KeyboardKeys.W);
-        
-            sprites.character.position = {
-                x: config.TILE_SIZE * 5,
-                y: config.TILE_SIZE * 5 + (isGoUp ? -5 : 0)
-            };
-            sprites.character.render(ctx);
+            character.render(ctx);
         },
 
         run() {
