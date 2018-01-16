@@ -15,6 +15,14 @@ export default class Sprite {
         this.position = position;
     }
 
+    setState(state) {
+        this.crop = state.crop;
+    }
+
+    setPosition(position) {
+        this.position = position;
+    }
+
     render(ctx) {
         ctx.drawImage(
             this.resource,

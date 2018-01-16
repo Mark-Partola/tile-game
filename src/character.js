@@ -1,6 +1,7 @@
 import config from './config.js';
 import KeyboardController, {KeyboardKeys} from './system/keyboard-controller.js';
 import Entity from './system/entity.js';
+import {states} from './sprites/character.js';
 
 const keyboardController = new KeyboardController();
 
@@ -35,6 +36,11 @@ export default class Character extends Entity {
             x: this.position.x + offset.x,
             y: this.position.y + offset.y
         };
+
+        if (isGoLeft) this.sprite.setState(states.LEFT);
+        else if (isGoRight) this.sprite.setState(states.RIGHT);
+        else if (isGoUp) this.sprite.setState(states.UP);
+        else if (isGoDown) this.sprite.setState(states.DOWN);
 
         this.sprite.position = this.position;
     }
