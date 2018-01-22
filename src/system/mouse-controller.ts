@@ -1,5 +1,9 @@
 export default class MouseController {
 
+    private isMouseDown;
+
+    private mousemove;
+
     constructor() {
         this.isMouseDown = false;
         this.mousemove = null;

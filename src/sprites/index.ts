@@ -1,9 +1,9 @@
-import loadResource from '../system/load-resource.js';
-import characterSprite from './character.js';
-import grassSprite from './grass.js';
-import groundSprite from './ground.js';
-import treeSprite from './tree.js';
-import waterSprite from './water.js';
+import loadResource from '../system/load-resource';
+import characterSprite from './character';
+import grassSprite from './grass';
+import groundSprite from './ground';
+import treeSprite from './tree';
+import waterSprite from './water';
 
 export default {
     init: () => Promise.all([

@@ -1,10 +1,10 @@
-import config from './config.js';
-import loop from './system/loop.js';
-import loadResource from './system/load-resource.js';
-import MouseController from './system/mouse-controller.js';
-import Entity from './system/entity.js';
-import spritesLoader from './sprites/index.js';
-import Character from './character.js';
+import config from './config';
+import loop from './system/loop';
+import loadResource from './system/load-resource';
+import MouseController from './system/mouse-controller';
+import Entity from './system/entity';
+import spritesLoader from './sprites/index';
+import Character from './character';
 
 const canvas = document.createElement('canvas');
 canvas.width = config.APP_WIDTH;
@@ -33,6 +33,10 @@ function init([sprites, level]) {
     const character = new Character(sprites.character);
 
     class Game extends Entity {
+
+        private offset;
+
+        private prevPosition;
 
         constructor() {
             super();

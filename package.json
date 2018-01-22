@@ -1,16 +1,22 @@
 {
-  "name": "test-modules",
+  "name": "tile-game",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "serve"
+    "start": "concurrently --kill-others \"webpack --display-error-details -w\" \"serve\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "serve": "^6.4.1"
+    "ramda": "^0.25.0"
+  },
+  "devDependencies": {
+    "concurrently": "^3.5.1",
+    "serve": "^6.4.8",
+    "ts-loader": "^3.3.0",
+    "typescript": "^2.6.2"
   }
 }

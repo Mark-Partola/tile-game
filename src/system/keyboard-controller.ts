@@ -11,6 +11,8 @@ export const KeyboardKeys = {
 
 export default class KeyboardController {
 
+    private activeKeys;
+
     constructor() {
         this.activeKeys = new Map();
 

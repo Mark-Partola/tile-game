@@ -1,5 +1,7 @@
 export default class Entity {
 
+    protected components;
+
     constructor() {
         this.components = [];
     }
@@ -8,13 +10,14 @@ export default class Entity {
         throw new Error('Unimplemented exception');
     }
 
-    render() {
+    render(ctx) {
         throw new Error('Unimplemented exception');
     }
 
-    run(ctx) {
+    run(ctx: CanvasRenderingContext2D) {
         this.update();
         this.render(ctx);
+
         this.components.forEach(component => component.run(ctx));
     }
 }

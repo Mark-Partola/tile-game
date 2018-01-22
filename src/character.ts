@@ -1,11 +1,16 @@
-import config from './config.js';
-import KeyboardController, {KeyboardKeys} from './system/keyboard-controller.js';
-import Entity from './system/entity.js';
-import {states} from './sprites/character.js';
+import config from './config';
+import KeyboardController, {KeyboardKeys} from './system/keyboard-controller';
+import Entity from './system/entity';
 
 const keyboardController = new KeyboardController();
 
 export default class Character extends Entity {
+
+    private sprite;
+
+    private position;
+
+    private speed;
 
     constructor(sprite) {
         super();
@@ -36,6 +41,8 @@ export default class Character extends Entity {
             x: this.position.x + offset.x,
             y: this.position.y + offset.y
         };
+
+        const states = this.sprite.getStates();
 
         if (isGoLeft) this.sprite.setState(states.LEFT);
         else if (isGoRight) this.sprite.setState(states.RIGHT);
