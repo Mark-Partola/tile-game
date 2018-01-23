@@ -85,10 +85,10 @@ function init([sprites, level]) {
                     cell.forEach(tile => renderTile(tile, pos));
                 } else {
                     const tile = spriteMap.get(cell);
-                    tile.position = {
+                    tile.setPosition({
                         x: pos.x * config.TILE_SIZE,
                         y: pos.y * config.TILE_SIZE
-                    };
+                    });
             
                     tile.render(ctx);
                 }

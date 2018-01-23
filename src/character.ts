@@ -49,7 +49,7 @@ export default class Character extends Entity {
         else if (isGoUp) this.sprite.setState(states.UP);
         else if (isGoDown) this.sprite.setState(states.DOWN);
 
-        this.sprite.position = this.position;
+        this.sprite.setPosition(this.position);
     }
 
     render(ctx) {

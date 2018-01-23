@@ -1,9 +1,9 @@
 import {assocPath} from 'ramda';
-import Sprite, {SpriteArgumentsType} from '../system/sprite';
+import Sprite, {SpriteConfigType} from '../system/sprite';
 import config from '../config';
 
 export default (resource) => {
-    const defaultSprite: SpriteArgumentsType = {
+    const defaultSprite: SpriteConfigType = {
         resource,
         dimensions: {
             width: config.TILE_SIZE,

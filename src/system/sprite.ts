@@ -1,62 +1,76 @@
 import {DimensionsType, PointType} from './types';
 
-export type SpriteArgumentsType = {
-    resource: any,
+export type SpriteConfigType = {
+    resource: ImageData,
     dimensions: DimensionsType,
     crop?: PointType,
     position?: PointType
+    flip?: boolean,
+    flop?: boolean
 }
 
 export default class Sprite {
 
+    private config: SpriteConfigType;
+
     private states;
 
-    private resource;
+    constructor(config: SpriteConfigType, states = {}) {
+        this.config = {
+            ...config,
+            position: {
+                x: 0,
+                y: 0,
+                ...config.position
+            },
+            crop: {
+                x: 0,
+                y: 0,
+                ...config.crop
+            }
+        };
 
-    private dimensions;
-
-    private crop;
-
-    private position;
-
-    constructor({
-        resource,
-        dimensions,
-        crop = {
-            x: 0,
-            y: 0
-        },
-        position = {
-            x: 0,
-            y: 0
-        }
-    }: SpriteArgumentsType, states = {}) {
         this.states = states;
-        this.resource = resource; 
-        this.dimensions = dimensions;
-        this.crop = crop;
-        this.position = position;
     }
 
     getStates() {
         return this.states;
     }
 
-    setState(state) {
-        this.crop = state.crop;
+    setState(config: SpriteConfigType) {
+        this.config = {
+            ...this.config,
+            ...config
+        };
     }
 
-    setPosition(position) {
-        this.position = position;
+    setPosition(position: PointType) {
+        this.config.position = position;
     }
 
     render(ctx) {
-        ctx.drawImage(
-            this.resource,
-            this.crop.x, this.crop.y,
-            this.dimensions.width, this.dimensions.height,
-            this.position.x, this.position.y,
-            this.dimensions.width, this.dimensions.height
+        ctx.save();
+
+        const {position, dimensions, crop} = this.config;
+
+        const flipScale = this.config.flip ? -1 : 1;
+        const flopScale = this.config.flop ? -1 : 1;
+
+        ctx.translate(
+            position.x + dimensions.width,
+            position.y + dimensions.height
         );
+
+        ctx.scale(flipScale, flopScale);
+
+        ctx.drawImage(
+            this.config.resource,
+            crop.x, crop.y,
+            dimensions.width, dimensions.height,
+            0, 0,
+            dimensions.width, dimensions.height
+        );
+
+        ctx.restore();
     } 
 }
